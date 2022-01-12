@@ -20,6 +20,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', 'username', 'age', 'password', 'password_confirm')
 
+    def validate_age(self, age):
+        if age < 16:
+            raise serializers.ValidationError('Sorry, but individuals under 16 cannot register on our platform')
+        return age
+
     def validate(self, validated_data):
         password = validated_data.get('password')
         password_confirm = validated_data.get('password_confirm')
