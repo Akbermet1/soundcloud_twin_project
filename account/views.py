@@ -12,3 +12,12 @@ class RegisterView(APIView):
         serilizer.is_valid(raise_exception=True)
         serilizer.save()
         return Response("You've been successfully registered", status=status.HTTP_201_CREATED)
+
+
+class ActivateView(APIView):
+    def get(self, request, activation_code):
+        user = get_object_or_404(User, activation_code=activation_code)
+        user.is_active = True
+        user.activation_code = ''
+        user.save()
+        return Response("You're account has been successfully activated, you can log into in now", status=status.HTTP_200_OK)
