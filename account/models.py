@@ -27,7 +27,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
-    email = models.EmailField(unique=True)
+    email = models.EmailField(primary_key=True)
     username = models.CharField(max_length=150, unique=True)
     age = models.PositiveSmallIntegerField()
     is_active = models.BooleanField(default=False)

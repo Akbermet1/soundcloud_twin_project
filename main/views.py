@@ -4,6 +4,11 @@ from rest_framework.response import Response
 from .models import Genre, Audio
 from .serializers import GenreSerializer, AudioSerializer
 from rest_framework import status
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+
+
+User = get_user_model()
 
 
 class GenreListCreateView(ListCreateAPIView):
@@ -20,9 +25,8 @@ class AudioViewSet(viewsets.ViewSet):
         serializer  = AudioSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    # def retrieve(self, request, pk):
-    #     ...
-    #     # queryset = 
-    #     # user = 
-    #     # serializer = 
-    #     # return Response('')
+    def retrieve(self, request, pk):
+        user = get_object_or_404(User, email=pk)
+        queryset = user.audios
+        serializer = AudioSerializer(queryset, many=True)
+        return Response(serializer.data)
