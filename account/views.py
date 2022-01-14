@@ -3,6 +3,8 @@ from rest_framework.views import APIView
 from .serializers import *
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
 
 
 class RegisterView(APIView):
@@ -21,3 +23,7 @@ class ActivateView(APIView):
         user.activation_code = ''
         user.save()
         return Response("You're account has been successfully activated, you can log into in now", status=status.HTTP_200_OK)
+
+
+class LoginView(ObtainAuthToken):
+    serializer_class = LoginSerializer
