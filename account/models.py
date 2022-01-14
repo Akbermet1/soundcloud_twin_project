@@ -4,8 +4,6 @@ from .utils import generate_activation_code
 
 
 class UserManager(BaseUserManager):
-    # email = models.EmailField()
-    # username = models.CharField(max_length=150)
     def _create(self, email, username, age, password, **extra_fields):
         if not email:
             raise ValueError('Please, enter your email address')

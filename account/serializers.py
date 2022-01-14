@@ -2,9 +2,24 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from django.contrib.auth.base_user import BaseUserManager
 
 
 User = get_user_model()
+
+def normalize_email(email):
+    """
+    Normalize the email address by lowercasing the domain part of it.
+    """
+    email = email or ''
+    try:
+        email_name, domain_part = email.strip().rsplit('@', 1)
+    except ValueError:
+        pass
+    else:
+        email = email_name + '@' + domain_part.lower()
+    return email
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
@@ -46,3 +61,28 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.send_activation_email(action='register')
         user.save()
         return user
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(min_length=6, required=True)
+
+    def validate_email(self, email):
+        email = normalize_email(email)
+
+        if not User.objects.filter(email=email).exists():
+            raise serializers.ValidationError('Пользователь не найден')
+        return email
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+        user = User.objects.get(email=email)
+
+        if not user.check_password(password):
+            raise serializers.ValidationError('Wrong password')
+
+        if not user.is_active:
+            return serializers.ValidationError('Please, activate your account in order to be able to login')
+        attrs['user'] = user
+        return attrs
