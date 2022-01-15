@@ -4,25 +4,25 @@ from .utils import generate_activation_code
 
 
 class UserManager(BaseUserManager):
-    def _create(self, email, username, age, password, **extra_fields):
+    def _create(self, email, username, age, password, avatar, background_image, **extra_fields):
         if not email:
             raise ValueError('Please, enter your email address')
 
         email = self.normalize_email(email)
-        user = self.model(email=email, username=username, age=age, password=password, **extra_fields)
+        user = self.model(email=email, username=username, age=age, password=password, avatar=avatar, background_image=background_image, **extra_fields)
         user.set_password(password)
         user.save()
         return user
 
-    def create_superuser(self, email, username, age, password, **extra_fields):
-        user = self._create(email, username, age, password, **extra_fields)
+    def create_superuser(self, email, username, age, password, avatar, background_image, **extra_fields):
+        user = self._create(email, username, age, password, avatar, background_image,**extra_fields)
         user.is_active = True
         user.is_staff = True
         user.save()
         return user
 
-    def create_user(self, email, username, age, password, **extra_fields):
-        return self._create(email, username, age, password, **extra_fields)
+    def create_user(self, email, username, age, password, avatar=None, background_image=None, **extra_fields):
+        return self._create(email, username, age, password, avatar, background_image, **extra_fields)
 
 
 
@@ -34,6 +34,8 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     activation_code = models.CharField(max_length=50)
+    avatar = models.ImageField(upload_to='users_avatars', blank=True, null=True)
+    background_image = models.ImageField(upload_to='background_images', blank=True, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'age']

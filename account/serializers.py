@@ -32,10 +32,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         style={'input_type': 'password'},
         required=True
     )
+    avatar = serializers.ImageField(required=False)
+    background_image = serializers.ImageField(required=False)
+
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'age', 'password', 'password_confirm')
+        fields = ('email', 'username', 'age', 'password', 'password_confirm', 'avatar', 'background_image')
 
     def validate_age(self, age):
         if age < 16:
