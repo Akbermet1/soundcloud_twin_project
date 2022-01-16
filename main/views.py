@@ -1,14 +1,12 @@
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from rest_framework import viewsets
 from rest_framework.response import Response
-from .models import Genre, Audio
-from .serializers import GenreSerializer, AudioSerializer
+from .models import Genre, Audio, Comment
+from .serializers import GenreSerializer, AudioSerializer, CommentSerializer
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework.mixins import ListModelMixin
 from rest_framework.pagination import PageNumberPagination
-
 
 User = get_user_model()
 
@@ -39,3 +37,6 @@ class AudioViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
+class ListCreateCommentView(ListCreateAPIView): # add a permission_class of isAuthenticated
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
