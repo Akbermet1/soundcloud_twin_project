@@ -30,10 +30,10 @@ class AudioViewSet(viewsets.ViewSet):
         return pagination.get_paginated_response(serializer.data)
         # return Response(serializer.data)
 
-    def retrieve(self, request, pk:str):
-        user = get_object_or_404(User, email=pk)
-        queryset = user.audios
-        serializer = AudioSerializer(queryset, many=True)
+    def retrieve(self, request, pk):
+        queryset = Audio.objects.all()
+        audio = get_object_or_404(queryset, pk=pk)
+        serializer = AudioSerializer(audio)
         return Response(serializer.data)
 
 
