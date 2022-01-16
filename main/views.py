@@ -39,19 +39,3 @@ class AudioViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
-# class AudioViewSet(viewsets.ModelViewSet):
-#     serializer_class  = AudioSerializer
-#     queryset = Audio.objects.all()
-#     # lookup_field = 'email'
-#     pagination_class = PageNumberPagination
-
-#     def list(self, request):
-#         queryset = Audio.objects.filter(visibility='Public')
-#         serializer  = AudioSerializer(queryset, many=True)
-#         return Response(serializer.data)
-
-#     def retrieve(self, request, pk:str):
-#         user = get_object_or_404(User, email=pk)
-#         queryset = user.audios
-#         serializer = AudioSerializer(queryset, many=True)
-#         return Response(serializer.data)
