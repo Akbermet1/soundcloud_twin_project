@@ -32,10 +32,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         style={'input_type': 'password'},
         required=True
     )
+    avatar = serializers.ImageField(required=False)
+    background_image = serializers.ImageField(required=False)
+
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'age', 'password', 'password_confirm')
+        fields = ('email', 'username', 'age', 'password', 'password_confirm', 'avatar', 'background_image')
 
     def validate_age(self, age):
         if age < 16:
@@ -54,8 +57,14 @@ class RegisterSerializer(serializers.ModelSerializer):
         username = validated_data.get('username')
         password = validated_data.get('password')
         age = validated_data.get('age')
+        avatar = None
+        if validated_data.get('avatar'):
+            avatar = validated_data.get('avatar')
+        background_image = None
+        if validated_data.get('background_image'):
+            background_image = validated_data.get('background_image')
         print(f'PASSSWORD: {password}')
-        user = User.objects.create_user(email=email, username=username, age=age, password=password)
+        user = User.objects.create_user(email=email, username=username, age=age, password=password, avatar=avatar, background_image=background_image)
         user.assign_activation_code()
         print('activation_code: ',user.activation_code)
         user.send_activation_email(action='register')
