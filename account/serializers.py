@@ -95,3 +95,29 @@ class LoginSerializer(serializers.Serializer):
             return serializers.ValidationError('Please, activate your account in order to be able to login')
         attrs['user'] = user
         return attrs
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(min_length=6, required=True)
+    new_password = serializers.CharField(min_length=6, required=True)
+    new_password_confirmation = serializers.CharField(min_length=6, required=True)
+
+    def validate_current_password(self, current_password):
+        print('self.context:', self.context)
+        user = self.context.get('request').user
+        if not user.check_password(current_password):
+            raise serializers.ValidationError("The password you've entered doesn't match your current password")
+        return current_password
+
+    def validate(self, validated_data):
+        new_password = validated_data.get('new_password')
+        new_password_confirmation = validated_data.get('new_password_confirmation')
+        if new_password != new_password_confirmation:
+            raise serializers.ValidationError("The new password and its confirmation don't match")
+        return validated_data
+    
+    def set_new_password(self):
+        new_password = self.validated_data.get('new_password')
+        user = self.context.get('request').user
+        user.set_password(new_password)
+        user.save()
