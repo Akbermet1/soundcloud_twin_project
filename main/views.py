@@ -7,6 +7,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.decorators import action
 
 User = get_user_model()
 
@@ -16,7 +17,7 @@ class GenreListCreateView(ListCreateAPIView):
     queryset = Genre.objects.all()
 
 
-class AudioViewSet(viewsets.ViewSet):
+class AudioViewSet(viewsets.ModelViewSet): # поменяла на ModelViewSet из-за того, что в ViewSet нету get_object(), который нужен для comments
     serializer_class  = AudioSerializer
     queryset = Audio.objects.all()
     pagination_class = PageNumberPagination
@@ -35,6 +36,21 @@ class AudioViewSet(viewsets.ViewSet):
         audio = get_object_or_404(queryset, pk=pk)
         serializer = AudioSerializer(audio)
         return Response(serializer.data)
+
+    # api/v1/products/id/comments/
+    @action(['GET', 'POST'], detail=True)
+    def comments(self, request, pk=None):
+        audio = self.get_object()
+        if request.method == 'GET':
+            comments = audio.comments.all()
+            serializer = CommentSerializer(comments, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            data = request.data
+            serializer = CommentSerializer(data=data, context={'request': request, 'audio': audio})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class ListCreateCommentView(ListCreateAPIView): # add a permission_class of isAuthenticated

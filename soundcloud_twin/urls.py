@@ -18,7 +18,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
-from main.views import GenreListCreateView, AudioViewSet
+from main.views import GenreListCreateView, AudioViewSet, ListCreateCommentView
 
 router = DefaultRouter()
 router.register('audios', AudioViewSet)
@@ -27,6 +27,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('account/', include(router.urls)),
     path('account/', include('account.urls')),
+    path('comments/', ListCreateCommentView.as_view()),
 ]
 
 if settings.DEBUG:
