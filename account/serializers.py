@@ -121,3 +121,45 @@ class ChangePasswordSerializer(serializers.Serializer):
         user = self.context.get('request').user
         user.set_password(new_password)
         user.save()
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+    def validate_email(self, email):
+        if not User.objects.filter(email=email).exists():
+            raise serializers.ValidationError('There is no user registered under the provided email')
+        return email
+
+    def send_code(self):
+        email = self.validated_data.get('email')
+        user = User.objects.get(email=email)
+        user.assign_activation_code()
+        user.send_activation_email(action='forgot password')
+
+
+class ForgotPasswordCompleteSerializer(serializers.Serializer):
+    confirmation_code = serializers.CharField(required=True)
+    new_password = serializers.CharField(min_length=6, required=True)
+    new_password_confirmation = serializers.CharField(min_length=6, required=True)
+
+    def validate_confirmation_code(self, confirmation_code):
+        if not User.objects.filter(activation_code=confirmation_code).exists():
+            raise serializers.ValidationError('There is no user with such confirmation code. Please, enter the confirmation code that was sent to your email')
+        return confirmation_code
+
+    def validate(self, validated_data):
+        new_password = validated_data.get('new_password')
+        new_password_confirmation = validated_data.get('new_password_confirmation')
+        if new_password != new_password_confirmation:
+            raise serializers.ValidationError("The new password and its confirmation don't match")
+        return validated_data
+
+    def set_new_password(self):
+        confirmation_code = self.validated_data.get('confirmation_code')
+        new_password = self.validated_data.get('new_password')
+        user = User.objects.get(activation_code=confirmation_code)
+        user.set_password(new_password)
+        user.save()
+
+    
