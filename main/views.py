@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .permissions import IsAuthor
 from rest_framework.filters import SearchFilter
+from django_filters.rest_framework.backends import DjangoFilterBackend
 
 User = get_user_model()
 
@@ -24,8 +25,9 @@ class AudioViewSet(viewsets.ModelViewSet): # поменяла на ModelViewSet 
     serializer_class  = AudioSerializer
     queryset = Audio.objects.all()
     pagination_class = PageNumberPagination
-    filter_backends = [SearchFilter]
+    filter_backends = [SearchFilter, DjangoFilterBackend]
     search_fields = ['title']
+    filterset_fields = ['genre']
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve'] or self.request.method == 'GET':
