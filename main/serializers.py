@@ -13,6 +13,13 @@ class AudioSerializer(serializers.ModelSerializer):
         model = Audio
         exclude = ['likes']
 
+    def create(self, validated_data):
+        user = self.context.get('request').user
+        print(self.context.get('request').user)
+        validated_data['uploader'] = user
+        print(validated_data)
+        return super().create(validated_data)
+
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
