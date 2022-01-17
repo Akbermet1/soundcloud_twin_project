@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
+from .serializers import ForgotPasswordSerializer, ForgotPasswordCompleteSerializer
 
 
 class RegisterView(APIView):
@@ -48,3 +49,12 @@ class ChangePasswordView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.set_new_password()
         return Response('Your password has been successfully updated', status=status.HTTP_200_OK)
+
+
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        data = request.data
+        serializer = ForgotPasswordSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.send_code()
+        return Response('An email with instructions was sent to the email that you used during registration', status=status.HTTP_200_OK)
