@@ -58,3 +58,12 @@ class ForgotPasswordView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.send_code()
         return Response('An email with instructions was sent to the email that you used during registration', status=status.HTTP_200_OK)
+
+
+class ForgotPasswordCompleteView(APIView):
+    def post(self, request):
+        data = request.data
+        serializer = ForgotPasswordCompleteSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.set_new_password()
+        return Response("You've successfully set a new password.", status=status.HTTP_200_OK)
