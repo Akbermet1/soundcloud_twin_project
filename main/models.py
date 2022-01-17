@@ -28,6 +28,19 @@ class Audio(models.Model):
     def __str__(self) -> str:
         return f'"{self.title}", uploaded by {self.uploader}'
 
+    def leave_like(self):
+        self.likes += 1
+        self.save()
+
+
+class Comment(models.Model):
+    text = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    audio = models.ForeignKey(Audio, on_delete=models.CASCADE, related_name='comments')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comment left by {self.user.email} on track titled '{self.audio.title}', track's id={self.audio.id}"
 
 # class UploadedAudio(models.Model):
 #     artist = models.ForeignKey(User, on_delete=models.CASCADE)
