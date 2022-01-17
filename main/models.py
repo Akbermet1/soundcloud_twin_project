@@ -28,6 +28,10 @@ class Audio(models.Model):
     def __str__(self) -> str:
         return f'"{self.title}", uploaded by {self.uploader}'
 
+    def leave_like(self):
+        self.likes += 1
+        self.save()
+
 
 class Comment(models.Model):
     text = models.CharField(max_length=200)

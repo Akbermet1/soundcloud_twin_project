@@ -62,6 +62,15 @@ class AudioViewSet(viewsets.ModelViewSet): # поменяла на ModelViewSet 
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @action(['POST'], detail=True)
+    def like(self, request, pk=None):
+        audio = self.get_object()
+        data = request.data
+        audio.leave_like()
+        serializer = CommentSerializer(data=data, context={'request': request, 'audio': audio})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 
 
 class DeleteCommentView(DestroyAPIView):
