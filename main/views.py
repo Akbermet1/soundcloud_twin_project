@@ -10,6 +10,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .permissions import IsAuthor
+from rest_framework.filters import SearchFilter
 
 User = get_user_model()
 
@@ -23,23 +24,29 @@ class AudioViewSet(viewsets.ModelViewSet): # поменяла на ModelViewSet 
     serializer_class  = AudioSerializer
     queryset = Audio.objects.all()
     pagination_class = PageNumberPagination
-    # lookup_field = 'email'
+    filter_backends = [SearchFilter]
+    search_fields = ['title']
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve'] or self.request.method == 'GET':
             return [IsAuthenticated()]
         elif self.action == 'reviews':
             if self.request.method == 'POST' or self.request.method == 'LIST':
                 return [IsAuthenticated()]
+        elif self.action == 'create':
+            return[IsAuthor()]
         return [IsAdminUser()]
 
-    def list(self, request):
-        queryset = Audio.objects.filter(visibility='Public')
-        pagination = PageNumberPagination()
-        qs = pagination.paginate_queryset(queryset, request)
-        serializer  = AudioSerializer(qs, many=True)
-        return pagination.get_paginated_response(serializer.data)
-        # return Response(serializer.data)
+    # пагинация работает и без этого, но с этим не работает поиск
+    # def list(self, request):
+    #     # queryset = Audio.objects.filter(visibility='Public')
+    #     # pagination = PageNumberPagination()
+    #     # qs = pagination.paginate_queryset(queryset, request)
+    #     # serializer = AudioSerializer(qs, many=True)
+    #     # return pagination.get_paginated_response(serializer.data)
+    #     queryset = Audio.objects.filter(visibility='Public')
+    #     serializer = AudioSerializer(queryset, many=True)
+    #     return Response(serializer.data)
 
     def retrieve(self, request, pk):
         queryset = Audio.objects.all()
