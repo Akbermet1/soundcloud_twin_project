@@ -1,4 +1,4 @@
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView, DestroyAPIView
 from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import Genre, Audio, Comment
@@ -8,6 +8,8 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from .permissions import IsAuthor
 
 User = get_user_model()
 
@@ -22,6 +24,14 @@ class AudioViewSet(viewsets.ModelViewSet): # поменяла на ModelViewSet 
     queryset = Audio.objects.all()
     pagination_class = PageNumberPagination
     # lookup_field = 'email'
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        elif self.action == 'reviews':
+            if self.request.method == 'POST' or self.request.method == 'LIST':
+                return [IsAuthenticated()]
+        return [IsAdminUser()]
 
     def list(self, request):
         queryset = Audio.objects.filter(visibility='Public')
@@ -53,6 +63,8 @@ class AudioViewSet(viewsets.ModelViewSet): # поменяла на ModelViewSet 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class ListCreateCommentView(ListCreateAPIView): # add a permission_class of isAuthenticated
+
+class DeleteCommentView(DestroyAPIView):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
+    permission_classes = [IsAuthor]
