@@ -18,7 +18,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
-from main.views import GenreListCreateView, AudioViewSet, DeleteCommentView
+from main.views import GenreListView, AudioViewSet, DeleteCommentView
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
@@ -40,6 +40,7 @@ urlpatterns = [
     path('account/', include(router.urls)),
     path('account/', include('account.urls')),
     path('comments/<int:pk>/delete/', DeleteCommentView.as_view()),
+    path('genres/', GenreListView.as_view()),
 ]
 
 if settings.DEBUG:
