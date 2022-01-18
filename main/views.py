@@ -35,10 +35,10 @@ class AudioViewSet(viewsets.ModelViewSet): # поменяла на ModelViewSet 
     def get_permissions(self):
         if self.action in ['list', 'retrieve'] or self.request.method == 'GET':
             return [IsAuthenticated()]
-        elif self.action == 'reviews':
+        elif self.action == 'comments':
             if self.request.method == 'POST' or self.request.method == 'LIST':
                 return [IsAuthenticated()]
-        elif self.action == 'create':
+        elif self.action == 'create' or self.action == 'delete':
             return[IsAuthor()]
         return [IsAdminUser()]
 
