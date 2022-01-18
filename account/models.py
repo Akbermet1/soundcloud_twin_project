@@ -87,7 +87,7 @@ class User(AbstractUser):
         else:
             subject = 'Password change'
             # this is not the final version of the message
-            # message = f'This is your confirmation code: {self.activation_code}'
+            message = f'This is your confirmation code: {self.activation_code}. Please provide it in order to change your password.'
 
         send_mail(
             subject,

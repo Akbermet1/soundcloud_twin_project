@@ -1,4 +1,4 @@
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView, DestroyAPIView
+from rest_framework.generics import ListCreateAPIView, DestroyAPIView, ListAPIView
 from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import Genre, Audio, Comment
@@ -11,21 +11,26 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .permissions import IsAuthor
 from rest_framework.filters import SearchFilter
+from django_filters.rest_framework.backends import DjangoFilterBackend
 
 User = get_user_model()
 
 
-class GenreListCreateView(ListCreateAPIView):
+# class GenreListCreateView(ListCreateAPIView):
+class GenreListView(ListAPIView):
     serializer_class = GenreSerializer
     queryset = Genre.objects.all()
+    permission_classes = [IsAuthenticated, ]
+
 
 
 class AudioViewSet(viewsets.ModelViewSet): # поменяла на ModelViewSet из-за того, что в ViewSet нету get_object(), который нужен для comments
     serializer_class  = AudioSerializer
     queryset = Audio.objects.all()
     pagination_class = PageNumberPagination
-    filter_backends = [SearchFilter]
+    filter_backends = [SearchFilter, DjangoFilterBackend]
     search_fields = ['title']
+    filterset_fields = ['genre']
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve'] or self.request.method == 'GET':
@@ -92,4 +97,4 @@ class AudioViewSet(viewsets.ModelViewSet): # поменяла на ModelViewSet 
 class DeleteCommentView(DestroyAPIView):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
-    permission_classes = [IsAuthor]
+    permission_classes = [IsAuthor, ]
