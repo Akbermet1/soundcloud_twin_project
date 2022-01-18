@@ -67,7 +67,7 @@ class AudioViewSet(viewsets.ModelViewSet): # поменяла на ModelViewSet 
         serializer = AudioSerializer(audio)
         return Response(serializer.data)
 
-    # api/v1/products/id/comments/
+    # api/v1/account/id/comments/
     @action(['GET', 'POST'], detail=True)
     def comments(self, request, pk=None):
         audio = self.get_object()
