@@ -54,12 +54,11 @@ class AudioViewSet(viewsets.ModelViewSet): # поменяла на ModelViewSet 
     #     return Response(serializer.data)
     def create(self, request):
         data = request.data
-        serializer = self.get_serializer(data=data, context={'request': request})
+        user = request.user
+        serializer = AudioSerializer(data=data, context={'uploader': user})
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        # headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # serializer(CommentSerializer(data=data, context={'request': request, 'audio': audio}))
 
 
     def retrieve(self, request, pk):

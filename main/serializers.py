@@ -1,6 +1,9 @@
 from multiprocessing import context
 from rest_framework import serializers
 from .models import Audio, Genre, Comment
+import io
+from rest_framework.parsers import JSONParser
+
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,13 +14,11 @@ class GenreSerializer(serializers.ModelSerializer):
 class AudioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Audio
-        exclude = ['likes']
+        exclude = ['likes', 'uploader']
 
     def create(self, validated_data):
-        user = self.context.get('request').user
-        print(self.context.get('request').user)
+        user = self.context.get('uploader')
         validated_data['uploader'] = user
-        print(validated_data)
         return super().create(validated_data)
 
 
